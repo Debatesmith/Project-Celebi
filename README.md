@@ -14,7 +14,7 @@ Project Celebi is a Gen1Recomp mod that turns Gold into something closer to an *
 
 ![Project Celebi Victory Road Gate](docs/images/victory-road-gate.png)
 
-##Getting Started: 
+Getting Started: 
 
 Starting Project Celebi only takes a few steps:
 
