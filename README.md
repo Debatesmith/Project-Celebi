@@ -14,6 +14,19 @@ Project Celebi is a Gen1Recomp mod that turns Gold into something closer to an *
 
 ![Project Celebi Victory Road Gate](docs/images/victory-road-gate.png)
 
+##Getting Started: 
+
+Starting Project Celebi only takes a few steps:
+
+Begin a new Pokémon Gold save and choose a starter.
+Project Celebi needs Gold's normal opening sequence to initialize the save before your Gen 1 data can be imported.
+Open the START menu.
+Select CELEBI.
+Choose the Pokémon Red, Blue, or Yellow save file you want to continue from.
+Confirm the import.
+
+That's it. Your Gen 1 trainer and Legacy data will be brought into Pokémon Gold, and you're free to continue into Johto.
+
 ## What Project Celebi does
 
 ### Continue your Gen 1 trainer
@@ -45,6 +58,8 @@ A completed Gen 1 Champion can travel through the Viridian / Route 22 side of th
 
 The Route 22 guard is removed specifically for Project Celebi Champions, while the separate **Mt. Silver guard remains controlled by Gold's normal progression**.
 
+Once in New Bark Town, YOU MUST CHOOSE A STARTER TO TRIGGER THE JOHTO STORYLINE. If you do not, the route north of Cherrygrove does not unlock. You can box the starter immediately after.
+
 ### Kanto remembers what you already accomplished
 
 Imported Kanto badges are represented in Gold's native systems, and the corresponding Kanto Gym Leaders are treated as already defeated where appropriate.
@@ -65,7 +80,7 @@ Gold-exclusive field progression such as Whirlpool and Waterfall remains native 
 
 ### Native Gold navigation
 
-Project Celebi imports receive the Gold-side navigation state needed to use the Pokegear / Town Map / Fly systems with their historical Kanto travel data.
+Gen 1 imports receive the Gold-side navigation state needed to use the Pokegear / Town Map / Fly systems with their historical Kanto travel data.
 
 Johto Fly destinations still have to be discovered normally.
 
@@ -73,11 +88,11 @@ Johto Fly destinations still have to be discovered normally.
 
 A Lv70–80 Gen 1 team makes vanilla early Johto meaningless, so Project Celebi adds a dedicated balance layer.
 
-### Frozen Project Celebi Difficulty Rating
+### Frozen Difficulty Rating
 
 When the player first enters the Johto campaign, Project Celebi permanently records a **Project Celebi Difficulty Rating** based on the median level of the three strongest Pokémon brought into Johto.
 
-The rating is frozen at that moment. The game does not continuously rubber-band against whichever Pokémon happen to be in your party later.
+The rating is frozen at that moment. The game does not continuously rubber-band against whichever Pokémon happen to be in your party later. This is a WIP
 
 ### Trainer scaling
 
@@ -98,7 +113,7 @@ Boss bonuses:
 | Johto Gym Leader | +3 |
 | Elite Four / Champion | +4 |
 
-For a Project Celebi Rating of 79, examples are approximately:
+For a level Rating of 79, examples are approximately:
 
 | Encounter | Scaled level |
 |---|---:|
@@ -114,9 +129,9 @@ Trainer Pokémon may advance **one normal level-based evolution stage** if the n
 
 ### Wild Pokémon catch-up
 
-Ordinary Johto wild encounters are raised into a band approximately **10–15 levels below the frozen Project Celebi Rating**.
+Ordinary Johto wild encounters are raised into a band approximately **10–15 levels below the frozen level rating**.
 
-At a Project Celebi Rating of 79, normal Johto wild Pokémon generally land around **Lv64–69** depending on the original encounter level.
+At a level rating of 79, normal Johto wild Pokémon generally land around **Lv64–69** depending on the original encounter level.
 
 Project Celebi changes the resulting level, not the encounter identity. Species tables, encounter rates, time-of-day behavior, and other authored encounter choices remain Gold's.
 
@@ -132,10 +147,10 @@ Kanto trainers and Kanto wild Pokémon are intentionally left unscaled.
 
 Gold's earliest rival chronology assumes a brand-new player. Project Celebi adjusts that sequence for an imported veteran trainer.
 
-Current Project Celebi Silver progression:
+Current Project Celebi Silver progression: All Rival Kanto Encounters are disabled until the player steps into New Bark Town for the first time.
 
 1. New Bark introduction
-2. Cherrygrove rookie rival battle **skipped**
+2. Cherrygrove rookie rival battle 
 3. Sprout Tower scene
 4. Azalea encounter
 5. Burned Tower encounter
