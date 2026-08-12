@@ -1,0 +1,17 @@
+{
+  "id": "legacy_bridge",
+  "name": "Project Celebi",
+  "version": "0.1.30",
+  "api": 2,
+  "entry": "main.lua",
+  "description": "Release Candidate QoL: opens the Viridian/Route 22 side of Victory Road Gate for imported Gen 1 Champions without touching Gold's Snorlax or Mt. Silver progression; retains rival continuity, badge repair, trainer/wild scaling and beta diagnostics.",
+  "games": [
+    "gold"
+  ],
+  "game_version": ">=0.1.78 <0.2.0",
+  "permissions": [
+    "filesystem",
+    "engine_internals"
+  ],
+  "category": "TOOL"
+}

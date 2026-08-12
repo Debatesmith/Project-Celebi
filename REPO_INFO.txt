@@ -1,0 +1,5 @@
+Repository name: Project-Celebi
+Description: Carry a Pokémon Red/Blue/Yellow Gen1Recomp save into Gold as a veteran-trainer expansion, with continuity-aware progression and Johto scaling.
+Topics: gen1recomp, pokemon, pokemon-gold, lua, love2d, modding, save-transfer, fan-mod
+First release tag: v0.1.30-beta
+First release title: Project Celebi v0.1.30 — Public Beta
