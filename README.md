@@ -1,242 +1,225 @@
-# Project Celebi
+# Project Celebi v0.1.31
 
-**Carry your Pokémon Red, Blue, or Yellow trainer into Pokémon Gold as a veteran — not as a brand-new kid starting over.**
+> **v0.1.31 public-beta hotfix:** Gen 1 `FARFETCHD` and `MR_MIME` are now translated to Gold's canonical `FARFETCH_D` and `MR__MIME` species IDs during party, box, and Pokédex import.
 
-Project Celebi is a Gen1Recomp mod that turns Gold into something closer to an **expansion pack for your existing Gen 1 save**. It creates a fresh native Gold world, then carries forward the parts of your Gen 1 history that should logically still belong to your trainer: your Pokémon, Pokédex progress, money, compatible possessions, Kanto accomplishments, travel history, and field-move access.
+## Release-candidate Kanto -> Johto access
 
-> [!IMPORTANT]
-> ## Public Beta: gameplay continuity first, narrative rewrite later
-> This release focuses on **save continuity, progression, balance, and making Johto playable with a veteran Gen 1 team**.
->
-> **Dialogue changes and immersion work are minimal in this version.** Most Gold NPC dialogue and story text is still vanilla. Characters may occasionally speak to your imported Champion as though they are a new trainer, and some scenes will have narrative inconsistencies with the fact that you already completed a Gen 1 adventure.
->
-> A future pass can rewrite dialogue and add more bespoke Project Celebi-specific story flavor. For this beta, expect the gameplay to understand your history better than the script does.
+Imported Gen 1 Champions can now walk from Viridian/Route 22 through the
+Victory Road Gate instead of being forced to Fly to Indigo Plateau first.
 
-![Project Celebi Victory Road Gate](docs/images/victory-road-gate.png)
+Gold places two separate Black Belt gatekeepers in that intersection:
 
-Getting Started: 
+    east / Route 22 guard   (12,5)  -> EVENT_FOUGHT_SNORLAX
+    west / Mt. Silver guard (7,5)   -> EVENT_OPENED_MT_SILVER
 
-Starting Project Celebi only takes a few steps:
+v0.1.30 masks only the east/Route 22 guard while a Project Celebi Champion is in the
+gate. It deliberately does NOT set EVENT_FOUGHT_SNORLAX, because that event
+also controls Gold's real Vermilion Snorlax encounter. The Mt. Silver guard is
+left untouched and disappears only when Gold's normal Mt. Silver progression
+opens it.
 
-Begin a new Pokémon Gold save and choose a starter.
-Project Celebi needs Gold's normal opening sequence to initialize the save before your Gen 1 data can be imported.
-Open the START menu.
-Select LEGACY.
-Choose the Pokémon Red, Blue, or Yellow save file you want to continue from.
-Confirm the import.
+The existing Project Celebi Champion badge-check bypass remains unchanged, so the
+player can walk Route 22 -> Victory Road Gate -> Route 26/27 -> Johto without
+being granted fake Johto badges.
 
-That's it. Your Gen 1 trainer and Legacy data will be brought into Pokémon Gold, and you're free to continue into Johto.
+`modData.legacy_bridge.diagnostics.victoryRoadGate` records whether the exact
+Route 22 guard object was found and masked.
 
-## What Project Celebi does
 
-### Continue your Gen 1 trainer
+## Silver Continuity v2
 
-Project Celebi can read the active Gen1Recomp save from **Red, Blue, or Yellow** and build an independent Gold save around it.
+No new import is required. Existing Project Celebi saves are migrated in place.
 
-It carries forward:
+The Project Celebi rival chronology is:
 
-- Your trainer name and Trainer ID
-- Your current party
-- All Pokémon in the original 12 Gen 1 PC boxes
-- Pokémon levels and accumulated EXP
-- DVs and Stat EXP
-- Pokémon moves and original trainer data
-- Pokédex seen/caught history
-- Play time
-- Money and coins
-- Compatible Bag and PC items
-- Historical Kanto Fly/travel destinations
-- Gen 1 badge history and completed Kanto Gym state
+    New Bark sighting
+    Cherrygrove rookie battle SKIPPED
+    Sprout Tower native Elder scene
+    Azalea native encounter
+    Burned Tower native encounter
+    Goldenrod Underground native encounter
+    Victory Road native encounter after 8 real Johto badges
+    Mt. Moon native encounter after Gold Hall of Fame
 
-Your imported Pokémon are healed when the Project Celebi save is first created. Gold-only story state is kept separate so Gen 1 history does not simply mark Johto events as completed.
+v0.1.29 fixes the root of the invisible-Silver bug. Older imports globally hid
+every extracted `SPRITE_RIVAL`, including Sprout Tower's scenery Silver. The
+Sprout Tower coord-event never calls `appear`; it immediately moves and talks
+through that already-existing object. The result was exactly what beta testing
+showed: Silver's dialogue and scripted movement ran while his sprite remained
+absent.
 
-### Start from your Kanto history instead of deleting it
+Fresh imports now lock only the two late-Kanto rival maps that truly need a
+pre-Johto chronology guard (Victory Road and Mt. Moon). Existing schema-9 saves
+receive a one-shot Sprout Tower scene re-arm plus Gold-native
+`World:appearObject()` repair. Burned Tower keeps the same native pre-visible
+repair because its deferred scene has the same live-object requirement.
 
-Project Celebi attempts to place you at the closest Gold-equivalent location to where your Gen 1 save was standing.
+### Johto badge-state repair
 
-A completed Gen 1 Champion can travel through the Viridian / Route 22 side of the Victory Road Gate and continue toward Route 26/27 and Johto without needing to begin Gold through its normal opening sequence.
+v0.1.29 also fixes an HM menu compatibility bug discovered in the beta save.
+The Project Celebi badge shim temporarily supplies Gold's Johto badge checks while
+authorizing a Gen 1 HM. Previous code tried to remember absent Lua keys by
+writing `nil` into a restore table; Lua removes nil-valued keys, so an HM use
+could accidentally leave all eight temporary Johto badges in the save.
 
-The Route 22 guard is removed specifically for Project Celebi Champions, while the separate **Mt. Silver guard remains controlled by Gold's normal progression**.
+The shim now stores an explicit presence bit and restores absent badge keys
+correctly. Existing schema-9 saves rebuild their genuine Johto badges from the
+native gym-victory events before continuing. Gold Hall-of-Fame detection now
+checks `hallOfFame.count > 0`; the normal `{ count = 0, teams = {} }` skeleton
+is no longer mistaken for post-League completion.
 
-Once in New Bark Town, YOU MUST CHOOSE A STARTER TO TRIGGER THE JOHTO STORYLINE. If you do not, the route north of Cherrygrove does not unlock. You can box the starter immediately after.
+### Beta diagnostics
 
-### Kanto remembers what you already accomplished
+`modData.legacy_bridge.rival.diagnostics` records the latest rival map/state,
+real Johto badge count, Gold HOF status, rival-object event visibility and the
+most recent continuity repair. Sprout Tower records `sproutTowerNativeRepair`;
+Burned Tower records `burnedTowerNativeRepair`. Both include the resolved object
+id/index, event flag, mask state and before/after live-entity verification.
 
-Imported Kanto badges are represented in Gold's native systems, and the corresponding Kanto Gym Leaders are treated as already defeated where appropriate.
+`modData.legacy_bridge.diagnostics.johtoBadgeLeakRepair` records the pre/post
+badge counts and the native gym-victory evidence used during migration.
+Rival battles also copy their scaled-party snapshot to
+`modData.legacy_bridge.rival.lastBattleScale`.
 
-Project Celebi does **not** grant fake Johto badges. Johto Gym progression remains a new campaign.
+## Project Celebi Johto Balance Pass v2
 
-### Gen 1 HMs remain useful
+No new import required. Existing Project Celebi saves can load this build directly.
 
-A Gen 1 badge can continue authorizing its matching field move when a party Pokémon actually knows that move:
+This build is the beta-candidate balance pass: Johto trainers now meet the
+imported veteran team near its own strength, and ordinary Johto wild Pokemon
+become practical catches instead of being dozens of levels behind.
 
-- Boulder Badge → Flash
-- Cascade Badge → Cut
-- Thunder Badge → Fly
-- Rainbow Badge → Strength
-- Soul Badge → Surf
+### Difficulty source
 
-Gold-exclusive field progression such as Whirlpool and Waterfall remains native to Gold.
+The border bootstrap permanently freezes:
 
-### Native Gold navigation
+    modData.legacy_bridge.difficulty.rating
 
-Gen 1 imports receive the Gold-side navigation state needed to use the Pokegear / Town Map / Fly systems with their historical Kanto travel data.
+from the median of the strongest three Pokemon brought into Johto.
 
-Johto Fly destinations still have to be discovered normally.
+The campaign does not rubber-band to the currently equipped party afterward.
+That frozen number remains the common baseline for both trainer and wild
+scaling.
 
-## Johto as a veteran campaign
+## Trainer scaling v2
 
-A Lv70–80 Gen 1 team makes vanilla early Johto meaningless, so Project Celebi adds a dedicated balance layer.
+Gold's supported:
 
-### Frozen Difficulty Rating
+    trainer.party
 
-When the player first enters the Johto campaign, Project Celebi permanently records a **Project Celebi Difficulty Rating** based on the median level of the three strongest Pokémon brought into Johto.
+hook is used after the real enemy party has been built.
 
-The rating is frozen at that moment. The game does not continuously rubber-band against whichever Pokémon happen to be in your party later. This is a WIP
+For each original trainer Pokemon:
 
-### Trainer scaling
+    target =
+        Project Celebi Rating
+        - 3
+        + round(vanilla level * 0.25)
+        + boss bonus
 
-Johto trainers are rebuilt around that Project Celebi Rating while preserving the structure of Gold's original progression.
+The target can never be below the original vanilla level.
 
-Current target curve:
+Boss bonus:
 
-```text
-target = Project Celebi Rating - 3 + round(vanilla level × 0.25) + boss bonus
-```
+    ordinary trainer       +0
+    Silver / Rival         +2
+    Johto Gym Leader       +3
+    Elite Four / Champion  +4
 
-Boss bonuses:
+Example with Project Celebi Rating 79:
 
-| Trainer type | Bonus |
-|---|---:|
-| Ordinary trainer | +0 |
-| Silver | +2 |
-| Johto Gym Leader | +3 |
-| Elite Four / Champion | +4 |
+    vanilla Lv 4  trainer  -> Lv77
+    Falkner Lv 9 ace       -> Lv81
+    Bugsy Lv 16 ace        -> Lv83
+    Whitney Lv 20 ace      -> Lv84
+    Morty Lv 25 ace        -> Lv85
+    Clair Lv 40 ace        -> Lv89
+    Lv 50 League opponent  -> Lv93
 
-For a level Rating of 79, examples are approximately:
+This gives early Johto trainers immediate parity with a veteran import while
+allowing the authored vanilla progression coordinate to pull later bosses above
+the frozen starting rating.
 
-| Encounter | Scaled level |
-|---|---:|
-| Early Lv4 trainer | Lv77 |
-| Falkner's Lv9 ace | Lv81 |
-| Bugsy's Lv16 ace | Lv83 |
-| Whitney's Lv20 ace | Lv84 |
-| Morty's Lv25 ace | Lv85 |
-| Clair's Lv40 ace | Lv89 |
-| Lv50 League opponent | Lv93 |
+### Trainer evolution promotion
 
-Trainer Pokémon may advance **one normal level-based evolution stage** if the new level qualifies. Their authored moves, DVs, Stat EXP, held item, happiness, and shiny state are preserved.
+Each enemy Pokemon may advance ONE normal level-evolution stage if its scaled
+level qualifies.
 
-### Wild Pokémon catch-up
+Item/trade/friendship evolutions are not forced.
 
-Ordinary Johto wild encounters are raised into a band approximately **10–15 levels below the frozen level rating**.
+The rebuild preserves:
 
-At a level rating of 79, normal Johto wild Pokémon generally land around **Lv64–69** depending on the original encounter level.
+    trainer DVs
+    stat EXP
+    held item
+    happiness
+    shiny state
+    exact authored move list
 
-Project Celebi changes the resulting level, not the encounter identity. Species tables, encounter rates, time-of-day behavior, and other authored encounter choices remain Gold's.
+## Wild catch-up v1
 
-Currently excluded from catch-up scaling:
+Ordinary Johto wild encounters are raised into a target band:
 
-- Bug-Catching Contest encounters
-- Roaming legendary beasts
-- Authored static/scripted wild encounters
+    Project Celebi Rating - 15  through  Project Celebi Rating - 10
 
-Kanto trainers and Kanto wild Pokémon are intentionally left unscaled.
+Vanilla level still nudges the result upward inside that six-level band, at
+roughly one target level for every seven vanilla levels. A naturally stronger
+vanilla encounter is never downscaled.
 
-## Silver / rival continuity
+Example with Project Celebi Rating 79:
 
-Gold's earliest rival chronology assumes a brand-new player. Project Celebi adjusts that sequence for an imported veteran trainer.
+    low-level early wilds  -> about Lv64
+    mid-level Johto wilds  -> about Lv65-L67
+    later Johto wilds      -> about Lv68-L69
 
-Current Project Celebi Silver progression: All Rival Kanto Encounters are disabled until the player steps into New Bark Town for the first time.
+Species, encounter rates, time-of-day tables, swarm choices and encounter-table
+identity remain vanilla. Only the resulting level is changed.
 
-1. New Bark introduction
-2. Cherrygrove rookie rival battle 
-3. Sprout Tower scene
-4. Azalea encounter
-5. Burned Tower encounter
-6. Goldenrod Underground encounter
-7. Victory Road encounter after 8 genuine Johto badges
-8. Mt. Moon encounter after Gold's Hall of Fame
+Catch-up scaling covers ordinary grass/cave/surf encounters, random scripted
+map-table rolls such as `randomwildmon`, Sweet Scent, and fishing.
 
-The later encounters return to Gold's native scripts wherever possible rather than replacing the entire rival campaign.
+Intentionally excluded:
 
-## Requirements
+    Bug-Catching Contest encounters
+    roaming legendary beasts
+    authored static/scripted wild encounters
 
-- **Gen1Recomp** with Gold support
-- Project Celebi currently declares compatibility with **Gen1Recomp `>= 0.1.78` and `< 0.2.0`**
-- An active Red, Blue, or Yellow Gen1Recomp save to import
-- A completed / Champion Gen 1 save is strongly recommended and is the intended way to enter the Project Celebi Johto campaign
+Those special encounters have mechanics/state that should stay authored rather
+than being treated as ordinary catch-up fodder.
 
-Gen1Recomp project: <https://github.com/bryanthaboi/gen1recomp>
+## Scope
 
-## Installation
+Balance scaling activates only after the Project Celebi Johto campaign has begun.
 
-1. Download the latest `ProjectCelebi-vX.X.XX.zip` from **Releases** on this repository.
-2. Open Gen1Recomp.
-3. Open the Mod Manager with **F10**.
-4. Install/import the Project Celebi ZIP and enable the mod for Gold.
-5. Launch Gold and use the Project Celebi import option to select your active Gen 1 save.
+Johto routes 29-46 and Johto cities/dungeons are scaled. Routes 26/27, Victory
+Road and Indigo Plateau count as Johto endgame territory once Johto is active.
 
-**Back up your saves before using a beta build.**
+Kanto trainers and Kanto wild encounters remain untouched.
 
-When updating Project Celebi, existing Project Celebi saves are normally migrated in place unless a specific release note says otherwise.
+## Recommended public-beta test
 
-## Current beta limitations
+No re-import is required for existing Project Celebi saves. For the new-player access
+check, use any imported Gen 1 Champion save that is still in Kanto:
 
-This release is intentionally a **systems-first public beta**.
+1. Walk from Viridian City west onto Route 22 and enter Victory Road Gate.
+2. The Black Belt on the Route 22/east side should be absent immediately.
+3. The Black Belt across the hall toward Mt. Silver should still be present
+   unless Gold's native Mt. Silver unlock has legitimately fired.
+4. Walk south through the gate to Route 26/27. The central Johto-badge officer
+   should not reject the imported Champion and no fake Johto badges should be
+   awarded.
+5. Continue west across Route 27; the existing Project Celebi Johto bootstrap should
+   take over normally.
 
-- **Dialogue is mostly vanilla Gold.** Narrative acknowledgement of your Gen 1 history is minimal.
-- **Immersion-specific changes are minimal.** The game systems know you are a veteran more often than the NPC script does.
-- Some story dialogue may contradict your Champion status or prior Kanto accomplishments.
-- The Cherrygrove rookie Silver battle is intentionally skipped rather than rewritten.
-- Special/static wild encounters are currently outside the normal Project Celebi wild-level scaler.
-- Some Gen 1 items cannot safely transfer because Gold has no true equivalent or reuses the same item name for unrelated story progression. Those items are skipped rather than silently converted into the wrong object.
-- Compatibility with every third-party Gen1Recomp mod has not been tested. If another mod changes the same Gold events, NPCs, trainer parties, wild encounter hooks, or save structures, conflicts are possible.
-- This is a beta. Keep backups.
+Existing schema-10 saves simply adopt schema 11 on load; the guard change is a
+per-map runtime mask and requires no destructive save migration.
 
-## Reporting bugs
+Diagnostics are stored under:
 
-The most useful bug report contains:
+    modData.legacy_bridge.difficulty.lastTrainerScale
+    modData.legacy_bridge.difficulty.lastWildScale
 
-1. Project Celebi version
-2. Gen1Recomp version
-3. Source game (Red / Blue / Yellow)
-4. What you were doing when the issue happened
-5. What you expected to happen
-6. Screenshot, if relevant
-7. The affected Gold save **immediately after the bug**
-8. `lua-error.log`, if one was produced
+The mod log also records each transformation as:
 
-Use the repository's **Issues** tab and choose the Project Celebi bug report template.
-
-## Diagnostics
-
-Project Celebi intentionally stores extra diagnostic state in the Project Celebi save during the public beta. This has already been useful for tracking down progression and event-state bugs without forcing players to restart their run.
-
-Diagnostics include recent trainer/wild scaling, rival continuity state, badge-state repairs, and Victory Road Gate handling.
-
-## Release status
-
-**Current release candidate:** `v0.1.30`
-
-The current build has been playtested through multiple Johto Gym Leaders, Sudowoodo progression, Sprout Tower / Silver continuity, Kanto-to-Johto travel, trainer scaling, and wild catch-up scaling.
-
-The goal of the public beta is to expose the remaining edge cases that are difficult to find in a single playthrough before the narrative/immersion pass begins.
-
-See [CHANGELOG.md](CHANGELOG.md) for the full development history.
-
-## Disclaimer
-
-Project Celebi is an **unofficial, non-commercial fan-made mod** for Gen1Recomp.
-
-It is not affiliated with, endorsed by, sponsored by, or associated with Nintendo, The Pokémon Company, Game Freak, Creatures Inc., or the Gen1Recomp project authors.
-
-Pokémon and related names, characters, and trademarks belong to their respective owners.
-
-**No Pokémon ROM, copyrighted game image/data package, or commercial game is distributed with Project Celebi.** Users are responsible for supplying whatever legally obtained game files are required by Gen1Recomp itself.
-
-## Credits
-
-- **Project Celebi** — community mod for Gen1Recomp
-- **Gen1Recomp** — [bryanthaboi/gen1recomp](https://github.com/bryanthaboi/gen1recomp)
-- The broader Pokémon reverse-engineering and preservation community whose work makes projects like Gen1Recomp possible
+    Project Celebi trainer scale ...
+    Project Celebi wild scale ...

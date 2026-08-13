@@ -1,0 +1,17 @@
+{
+  "id": "legacy_bridge",
+  "name": "Project Celebi",
+  "version": "0.1.31",
+  "api": 2,
+  "entry": "main.lua",
+  "description": "Public beta hotfix: correctly maps Gen 1 Farfetch'd and Mr. Mime species IDs into Gold, including Pokédex state; retains Kanto continuity, rival fixes, trainer/wild scaling and Victory Road Gate QoL.",
+  "games": [
+    "gold"
+  ],
+  "game_version": ">=0.1.78 <0.2.0",
+  "permissions": [
+    "filesystem",
+    "engine_internals"
+  ],
+  "category": "TOOL"
+}
