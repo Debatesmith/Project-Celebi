@@ -1,15 +1,5 @@
 # Changelog
 
-## 0.1.31
-
-- Fixes legitimate Gen 1 Farfetch'd imports failing because RBY uses the symbolic ID `FARFETCHD` while Gold uses `FARFETCH_D`.
-- Adds the equivalent Gen 1 -> Gold compatibility mapping for Mr. Mime: `MR_MIME` -> `MR__MIME`.
-- Applies the same canonical species mapping to imported Pokédex seen/caught state so Gen 1-only spellings do not leak into Gold saves.
-- Keeps unsupported/fakemon species as explicit import failures when they are physically present in the party or PC boxes.
-- Existing successfully imported Project Celebi saves do not need to re-import; affected players should retry their original Gen 1 save with v0.1.31.
-- Retains v0.1.30 Victory Road Gate QoL, rival continuity, Johto badge repair, trainer parity scaling, and wild catch-up scaling.
-- Save metadata schema remains 11; this is an importer compatibility hotfix, not a save-format migration.
-
 ## 0.1.30
 
 - Opens the Viridian/Route 22 side of Victory Road Gate for imported Gen 1 Champions, allowing a fully walkable Kanto -> Johto route without first Flying to Indigo Plateau.
