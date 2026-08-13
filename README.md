@@ -21,7 +21,7 @@ Starting Project Celebi only takes a few steps:
 Begin a new Pokémon Gold save and choose a starter.
 Project Celebi needs Gold's normal opening sequence to initialize the save before your Gen 1 data can be imported.
 Open the START menu.
-Select CELEBI.
+Select LEGACY.
 Choose the Pokémon Red, Blue, or Yellow save file you want to continue from.
 Confirm the import.
 
